@@ -2,16 +2,28 @@ import Header from '~/components/header'
 import type { Route } from './+types/home'
 import { Card, CardContent } from '~/components/ui/card'
 
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: 'New React Router App' },
-    { name: 'description', content: 'Welcome to React Router!' },
-  ]
+export async function action({ request }: Route.ActionArgs) {
+  const formData = await request.formData()
+  const date = formData.get('date')
+  const mistakes = formData.get('mistakes')
+  const triggers = formData.get('triggers')
+  const impacts = formData.get('impacts')
+  const futureImpacts = formData.get('futureImpacts')
+  const preventionSteps = formData.get('preventionSteps')
+
+  console.log({
+    date,
+    mistakes,
+    triggers,
+    impacts,
+    futureImpacts,
+    preventionSteps,
+  })
 }
 
 export default function Home() {
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto px-4 max-w-3xl">
       <Header />
       <div>
         <Card>

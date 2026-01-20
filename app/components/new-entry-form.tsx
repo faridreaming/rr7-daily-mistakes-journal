@@ -1,31 +1,29 @@
-import { Plus } from 'lucide-react'
+import { ChevronDownIcon, Plus } from 'lucide-react'
 import { useState } from 'react'
-import { Form } from 'react-router'
+import { useFetcher } from 'react-router'
+import { Button } from '~/components/ui/button'
+import { Calendar } from '~/components/ui/calendar'
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '~/components/ui/dialog'
-import { ChevronDownIcon } from 'lucide-react'
-import { Button } from '~/components/ui/button'
-import { Calendar } from '~/components/ui/calendar'
 import { Label } from '~/components/ui/label'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '~/components/ui/popover'
-import { Textarea } from './ui/textarea'
-import { useFetcher } from 'react-router'
 import { formFields } from '~/data/form-fields.data'
+import { Textarea } from './ui/textarea'
+import { Spinner } from './ui/spinner'
 
 export default function NewEntryForm() {
-  let fetcher = useFetcher()
+  const fetcher = useFetcher()
   const [open, setOpen] = useState(false)
   const [date, setDate] = useState<Date | undefined>(undefined)
 
@@ -34,7 +32,7 @@ export default function NewEntryForm() {
       <DialogTrigger asChild>
         <Button autoFocus>
           <Plus />
-          New Entry
+          New Journal
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
@@ -51,7 +49,7 @@ export default function NewEntryForm() {
                   <input
                     type="hidden"
                     name={field.name}
-                    value={date?.toISOString()}
+                    value={date?.toISOString() || ''}
                   />
                   <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
@@ -83,6 +81,17 @@ export default function NewEntryForm() {
                       />
                     </PopoverContent>
                   </Popover>
+                  {fetcher.data?.errors?.find(
+                    (error: any) => error.field === field.name,
+                  ) && (
+                    <p className="text-sm text-destructive">
+                      {
+                        fetcher.data.errors.find(
+                          (error: any) => error.field === field.name,
+                        ).message
+                      }
+                    </p>
+                  )}
                 </div>
               )
             } else if (field.type === 'textarea') {
@@ -94,6 +103,17 @@ export default function NewEntryForm() {
                     name={field.name}
                     placeholder={field.placeholder}
                   />
+                  {fetcher.data?.errors?.find(
+                    (error: any) => error.field === field.name,
+                  ) && (
+                    <p className="text-sm text-destructive">
+                      {
+                        fetcher.data.errors.find(
+                          (error: any) => error.field === field.name,
+                        ).message
+                      }
+                    </p>
+                  )}
                 </div>
               )
             }
@@ -102,7 +122,10 @@ export default function NewEntryForm() {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit">Save changes</Button>
+            <Button type="submit" disabled={fetcher.state === 'submitting'}>
+              {fetcher.state === 'submitting' && <Spinner />}
+              Save Journal
+            </Button>
           </div>
         </fetcher.Form>
       </DialogContent>
